@@ -5,9 +5,13 @@ import random
 import string
 import time
 import platform
+import signal
+import sys
 from datetime import datetime
 
 VERSION = "3.0"
+RUNNING = True
+
 
 def banner():
     os.system("cls" if os.name == "nt" else "clear")
@@ -22,8 +26,8 @@ def banner():
 
               🚀 MunnaTheDev Project 🚀
 ═══════════════════════════════════════════════
- Author      : MunnaTheDev
- Version     : {VERSION}
+ Author       : MunnaTheDev
+ Version      : {VERSION}
  Python       : {platform.python_version()}
  System       : {platform.system()} {platform.release()}
  Machine      : {platform.machine()}
@@ -31,28 +35,42 @@ def banner():
 \033[0m
 """)
 
-def log(message):
+
+def log(message: str):
     now = datetime.now().strftime("%H:%M:%S")
     print(f"\033[92m[{now}]\033[0m {message}")
+    sys.stdout.flush()
 
-def random_string(length=100):
+
+def random_string(length: int = 100) -> str:
     chars = string.ascii_letters + string.digits
     return ''.join(random.choices(chars, k=length))
 
+
+def handle_signal(signum, frame):
+    global RUNNING
+    log(f"Received signal {signum}. Shutting down...")
+    RUNNING = False
+
+
 def main():
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
+
     folder = "MunnaTheDev"
     os.makedirs(folder, exist_ok=True)
 
     banner()
     log("File I/O Demonstration Started")
 
-    while True:
+    while RUNNING:
         try:
             file_name = os.path.join(
                 folder,
                 f"{random_string(8)}.txt"
             )
 
+            # Create file
             with open(file_name, "w") as f:
                 for _ in range(random.randint(10, 100)):
                     f.write(random_string() + "\n")
@@ -60,6 +78,7 @@ def main():
             log(f"Created: {file_name}")
             time.sleep(2)
 
+            # Edit file
             with open(file_name, "w") as f:
                 for _ in range(random.randint(10, 100)):
                     f.write(random_string() + "\n")
@@ -67,17 +86,17 @@ def main():
             log(f"Edited: {file_name}")
             time.sleep(1)
 
+            # Delete file
             os.remove(file_name)
             log(f"Deleted: {file_name}")
             time.sleep(1)
 
-        except KeyboardInterrupt:
-            log("Stopped by user.")
-            break
-
         except Exception as e:
             log(f"Error: {e}")
             time.sleep(5)
+
+    log("Exited cleanly.")
+
 
 if __name__ == "__main__":
     main()
