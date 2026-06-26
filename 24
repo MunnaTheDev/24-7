@@ -4,57 +4,80 @@ import os
 import random
 import string
 import time
+import platform
+from datetime import datetime
 
-def display_banner():
-    print(r"""
+VERSION = "3.0"
 
-    ███╗   ███╗██╗   ██╗███╗   ██╗███╗   ██╗ █████╗
-    ████╗ ████║██║   ██║████╗  ██║████╗  ██║██╔══██╗
-    ██╔████╔██║██║   ██║██╔██╗ ██║██╔██╗ ██║███████║
-    ██║╚██╔╝██║██║   ██║██║╚██╗██║██║╚██╗██║██╔══██║
-    ██║ ╚═╝ ██║╚██████╔╝██║ ╚████║██║ ╚████║██║  ██║
-    ╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚═╝  ╚═╝
+def banner():
+    os.system("cls" if os.name == "nt" else "clear")
+    print(f"""
+\033[96m
+███╗   ███╗██╗   ██╗███╗   ██╗███╗   ██╗ █████╗
+████╗ ████║██║   ██║████╗  ██║████╗  ██║██╔══██╗
+██╔████╔██║██║   ██║██╔██╗ ██║██╔██╗ ██║███████║
+██║╚██╔╝██║██║   ██║██║╚██╗██║██║╚██╗██║██╔══██║
+██║ ╚═╝ ██║╚██████╔╝██║ ╚████║██║ ╚████║██║  ██║
+╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚═╝  ╚═╝
 
-                     MunnaTheDev
-    """)
+              🚀 MunnaTheDev Project 🚀
+═══════════════════════════════════════════════
+ Author      : MunnaTheDev
+ Version     : {VERSION}
+ Python       : {platform.python_version()}
+ System       : {platform.system()} {platform.release()}
+ Machine      : {platform.machine()}
+═══════════════════════════════════════════════
+\033[0m
+""")
 
-def generate_random_string(length=100):
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+def log(message):
+    now = datetime.now().strftime("%H:%M:%S")
+    print(f"\033[92m[{now}]\033[0m {message}")
 
-def create_edit_delete_file():
-    folder_name = "MunnaTheDev"
-    os.makedirs(folder_name, exist_ok=True)
+def random_string(length=100):
+    chars = string.ascii_letters + string.digits
+    return ''.join(random.choices(chars, k=length))
+
+def main():
+    folder = "MunnaTheDev"
+    os.makedirs(folder, exist_ok=True)
+
+    banner()
+    log("File I/O Demonstration Started")
 
     while True:
         try:
             file_name = os.path.join(
-                folder_name,
-                f"{generate_random_string(8)}.txt"
+                folder,
+                f"{random_string(8)}.txt"
             )
 
-            with open(file_name, "w") as file:
+            with open(file_name, "w") as f:
                 for _ in range(random.randint(10, 100)):
-                    file.write(generate_random_string(100) + "\n")
-            print(f"[MunnaTheDev] Created: {file_name}")
+                    f.write(random_string() + "\n")
 
+            log(f"Created: {file_name}")
             time.sleep(2)
 
-            with open(file_name, "w") as file:
+            with open(file_name, "w") as f:
                 for _ in range(random.randint(10, 100)):
-                    file.write(generate_random_string(100) + "\n")
-            print(f"[MunnaTheDev] Edited: {file_name}")
+                    f.write(random_string() + "\n")
 
+            log(f"Edited: {file_name}")
             time.sleep(1)
 
             os.remove(file_name)
-            print(f"[MunnaTheDev] Deleted: {file_name}")
-
+            log(f"Deleted: {file_name}")
             time.sleep(1)
 
+        except KeyboardInterrupt:
+            log("Stopped by user.")
+            break
+
         except Exception as e:
-            print(f"[MunnaTheDev] An error occurred: {e}")
+            log(f"Error: {e}")
             time.sleep(5)
 
 if __name__ == "__main__":
-    display_banner()
-    create_edit_delete_file()
+    main()
